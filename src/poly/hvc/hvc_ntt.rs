@@ -6,7 +6,7 @@ use crate::{HVC_MODULUS, N};
 #[derive(Debug, Clone, Copy)]
 // HVC polynomials in NTT encoding
 pub struct HVCNTTPoly {
-    pub(crate) coeffs: [i32; N as usize],
+    pub(crate) coeffs: [i32; N],
 }
 
 impl_poly!(HVCNTTPoly, HVC_MODULUS, N);

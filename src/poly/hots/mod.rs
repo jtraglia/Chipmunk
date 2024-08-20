@@ -18,7 +18,7 @@ pub use hots_ntt::HOTSNTTPoly;
 #[derive(Debug, Clone, Copy)]
 // HVC polynomials in canonical encoding
 pub struct HOTSPoly {
-    pub(crate) coeffs: [i32; N as usize],
+    pub(crate) coeffs: [i32; N],
 }
 
 impl_signed_poly!(HOTSPoly, HOTS_MODULUS, N);
@@ -35,12 +35,12 @@ impl From<&HVCPoly> for HOTSPoly {
     fn from(p: &HVCPoly) -> Self {
         let mut coeffs = p.coeffs.clone();
         for x in coeffs.iter_mut() {
-            *x = *x % HVC_MODULUS as i32;
+            *x = *x % HVC_MODULUS;
             if *x > HVC_MODULUS_OVER_TWO {
-                *x -= HVC_MODULUS as i32
+                *x -= HVC_MODULUS
             }
             if *x < -HVC_MODULUS_OVER_TWO {
-                *x += HVC_MODULUS as i32
+                *x += HVC_MODULUS
             }
         }
 

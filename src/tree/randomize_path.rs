@@ -8,9 +8,8 @@ use crate::path::Path;
 use crate::{
     poly::{HVCPoly, TerPolyCoeffEncoding},
     randomizer::Randomizers,
-    HVCHash, HEIGHT, HVC_WIDTH,
+    HVCHash, ENCODING_NORM_BOUND, HEIGHT, HVC_WIDTH,
 };
-use crate::{Polynomial, ENCODING_NORM_BOUND};
 use core::fmt;
 use std::fmt::Display;
 use std::io::{Read, Write};

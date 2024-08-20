@@ -7,7 +7,7 @@ use super::ntt_param::{INV_NTT_TABLE, NTT_TABLE};
 #[derive(Debug, Clone, Copy)]
 // HVC polynomials in NTT encoding
 pub struct HOTSNTTPoly {
-    pub(crate) coeffs: [i32; N as usize],
+    pub(crate) coeffs: [i32; N],
 }
 
 impl_poly!(HOTSNTTPoly, HOTS_MODULUS, N);

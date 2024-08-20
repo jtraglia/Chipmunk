@@ -20,7 +20,7 @@ pub use hvc_ntt::HVCNTTPoly;
 #[derive(Debug, Clone, Copy)]
 // HVC polynomials in canonical encoding
 pub struct HVCPoly {
-    pub(crate) coeffs: [i32; N as usize],
+    pub(crate) coeffs: [i32; N],
 }
 
 impl_signed_poly!(HVCPoly, HVC_MODULUS, N);
