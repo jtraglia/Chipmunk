@@ -1,6 +1,7 @@
 use ark_std::{end_timer, start_timer};
 #[cfg(feature = "parallel")]
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
+#[cfg(feature = "parallel")]
 use rayon::prelude::{IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator};
 
 use crate::encoding::EncodedPoly;
@@ -145,6 +146,14 @@ impl RandomizedPath {
     pub(crate) fn aggregate_with_randomizers(paths: &[Self], randomizers: &Randomizers) -> Self {
         let timer = start_timer!(|| format!("aggregate {} paths", paths.len()));
         let mut randomized_paths: Vec<RandomizedPath> = paths.to_vec();
+
+        #[cfg(not(feature = "parallel"))]
+        randomized_paths
+            .iter_mut()
+            .zip(randomizers.poly.iter())
+            .for_each(|(path, randomizer)| path.randomize_with(randomizer));
+
+        #[cfg(feature = "parallel")]
         randomized_paths
             .par_iter_mut()
             .zip(randomizers.poly.par_iter())
@@ -168,11 +177,20 @@ impl RandomizedPath {
         // recompute the root
         let randomziers = Randomizers::from_pks(roots);
 
+        #[cfg(not(feature = "parallel"))]
+        let tmp: Vec<_> = roots
+            .iter()
+            .zip(randomziers.poly.iter())
+            .map(|(&rt, rand)| HVCPoly::from(rand) * rt)
+            .collect();
+
+        #[cfg(feature = "parallel")]
         let tmp: Vec<_> = roots
             .par_iter()
             .zip(randomziers.poly.par_iter())
             .map(|(&rt, rand)| HVCPoly::from(rand) * rt)
             .collect();
+
         let root = tmp.iter().fold(HVCPoly::default(), |acc, mk| acc + *mk);
 
         // check that the first two elements hashes to root
@@ -206,11 +224,20 @@ impl RandomizedPath {
         // recompute the root
         let randomziers = Randomizers::from_pks(roots);
 
+        #[cfg(not(feature = "parallel"))]
+        let tmp: Vec<_> = roots
+            .iter()
+            .zip(randomziers.poly.iter())
+            .map(|(&rt, rand)| HVCPoly::from(rand) * rt)
+            .collect();
+
+        #[cfg(feature = "parallel")]
         let tmp: Vec<_> = roots
             .par_iter()
             .zip(randomziers.poly.par_iter())
             .map(|(&rt, rand)| HVCPoly::from(rand) * rt)
             .collect();
+
         let root = tmp.iter().fold(HVCPoly::default(), |acc, mk| acc + *mk);
 
         // check that the first two elements hashes to root
@@ -219,10 +246,19 @@ impl RandomizedPath {
         }
         let position_list: Vec<_> = self.position_list().collect();
 
-        let checks = self
+        #[cfg(not(feature = "parallel"))]
+        let iter = self
             .nodes
             .clone()
-            .into_par_iter()
+            .into_iter();
+
+        #[cfg(feature = "parallel")]
+        let iter = self
+            .nodes
+            .clone()
+            .into_par_iter();
+
+        let checks = iter
             .enumerate()
             .skip(1)
             .map(|(i, (left, right))| {
