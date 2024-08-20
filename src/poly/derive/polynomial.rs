@@ -294,7 +294,7 @@ macro_rules! impl_signed_poly_functions {
             /// If the polynomial's coefficients are ternary
             fn is_ternary(&self) -> bool {
                 for &e in self.coeffs.iter() {
-                    if e != 1 && e != -1 {
+                    if e != 1 && e != 0 && e != -1 {
                         return false;
                     }
                 }
